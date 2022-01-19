@@ -1,14 +1,19 @@
-pragma solidity ^0.4.24;
+pragma solidity >=0.4.24;
+
+import "../coffeeaccesscontrol/ConsumerRole.sol";
+import "../coffeeaccesscontrol/DistributorRole.sol";
+import "../coffeeaccesscontrol/FarmerRole.sol";
+import "../coffeeaccesscontrol/RetailerRole.sol";
 
 /// Provides basic authorization control
-contract Ownable {
+contract Ownable is ConsumerRole, DistributorRole, FarmerRole, RetailerRole {
     address private origOwner;
 
     // Define an Event
     event TransferOwnership(address indexed oldOwner, address indexed newOwner);
 
     /// Assign the contract to an owner
-    constructor () internal {
+    constructor() {
         origOwner = msg.sender;
         emit TransferOwnership(address(0), origOwner);
     }
