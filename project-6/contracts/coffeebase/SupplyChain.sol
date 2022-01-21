@@ -4,9 +4,6 @@ import "../coffeecore/Ownable.sol";
 
 // Define a contract 'Supplychain'
 contract SupplyChain is Ownable {
-    // Define 'owner'
-    address owner;
-
     // Define a variable called 'upc' for Universal Product Code (UPC)
     uint256 upc;
 
@@ -63,12 +60,6 @@ contract SupplyChain is Ownable {
     event Received(uint256 upc);
     event Purchased(uint256 upc);
 
-    // Define a modifer that checks to see if msg.sender == owner of the contract
-    modifier onlyOwner() {
-        require(msg.sender == owner);
-        _;
-    }
-
     // Define a modifer that verifies the Caller
     modifier verifyCaller(address _address) {
         require(msg.sender == _address);
@@ -97,36 +88,43 @@ contract SupplyChain is Ownable {
 
     // Define a modifier that checks if an item.state of a upc is Processed
     modifier processed(uint256 _upc) {
+        require(items[_upc].itemState == State.Processed);
         _;
     }
 
     // Define a modifier that checks if an item.state of a upc is Packed
     modifier packed(uint256 _upc) {
+        require(items[_upc].itemState == State.Packed);
         _;
     }
 
     // Define a modifier that checks if an item.state of a upc is ForSale
     modifier forSale(uint256 _upc) {
+        require(items[_upc].itemState == State.ForSale);
         _;
     }
 
     // Define a modifier that checks if an item.state of a upc is Sold
     modifier sold(uint256 _upc) {
+        require(items[_upc].itemState == State.Sold);
         _;
     }
 
     // Define a modifier that checks if an item.state of a upc is Shipped
     modifier shipped(uint256 _upc) {
+        require(items[_upc].itemState == State.Shipped);
         _;
     }
 
     // Define a modifier that checks if an item.state of a upc is Received
     modifier received(uint256 _upc) {
+        require(items[_upc].itemState == State.Received);
         _;
     }
 
     // Define a modifier that checks if an item.state of a upc is Purchased
     modifier purchased(uint256 _upc) {
+        require(items[_upc].itemState == State.Purchased);
         _;
     }
 
@@ -134,16 +132,13 @@ contract SupplyChain is Ownable {
     // and set 'sku' to 1
     // and set 'upc' to 1
     constructor() payable {
-        owner = msg.sender;
         sku = 1;
         upc = 1;
     }
 
     // Define a function 'kill' if required
-    function kill() public {
-        if (msg.sender == owner) {
-            selfdestruct(payable(owner));
-        }
+    function kill() public onlyOwner {
+        selfdestruct(payable(msg.sender));
     }
 
     // Define a function 'harvestItem' that allows a farmer to mark an item 'Harvested'
@@ -155,48 +150,68 @@ contract SupplyChain is Ownable {
         string memory _originFarmLatitude,
         string memory _originFarmLongitude,
         string memory _productNotes
-    ) public {
+    ) public onlyFarmer {
         // Add the new item as part of Harvest
+        Item memory item;
+        item.upc = _upc;
+        item.sku = sku;
+        item.ownerID = _originFarmerID;
+        item.originFarmerID = _originFarmerID;
+        item.originFarmName = _originFarmName;
+        item.originFarmInformation = _originFarmInformation;
+        item.originFarmLatitude = _originFarmLatitude;
+        item.originFarmLongitude = _originFarmLongitude;
+        item.productID = _upc + sku;
+        item.productNotes = _productNotes;
+        item.itemState = State.Harvested;
 
         // Increment sku
         sku = sku + 1;
+
         // Emit the appropriate event
+        emit Harvested(_upc);
     }
 
     // Define a function 'processtItem' that allows a farmer to mark an item 'Processed'
     function processItem(uint256 _upc)
         public
-    // Call modifier to check if upc has passed previous supply chain stage
-
-    // Call modifier to verify caller of this function
-
+        // Call modifier to check if upc has passed previous supply chain stage
+        harvested(_upc)
+        // Call modifier to verify caller of this function
+        onlyFarmer
     {
         // Update the appropriate fields
+
         // Emit the appropriate event
+        emit Processed(_upc);
     }
 
     // Define a function 'packItem' that allows a farmer to mark an item 'Packed'
     function packItem(uint256 _upc)
         public
-    // Call modifier to check if upc has passed previous supply chain stage
-
-    // Call modifier to verify caller of this function
-
+        // Call modifier to check if upc has passed previous supply chain stage
+        processed(_upc)
+        // Call modifier to verify caller of this function
+        onlyFarmer
     {
         // Update the appropriate fields
+
         // Emit the appropriate event
+        emit Packed(_upc);
     }
 
     // Define a function 'sellItem' that allows a farmer to mark an item 'ForSale'
     function sellItem(uint256 _upc, uint256 _price)
         public
-    // Call modifier to check if upc has passed previous supply chain stage
-
-    // Call modifier to verify caller of this function
-
+        // Call modifier to check if upc has passed previous supply chain stage
+        packed(_upc)
+        // Call modifier to verify caller of this function
+        onlyFarmer
     {
         // Update the appropriate fields
+
         // Emit the appropriate event
+        emit ForSale(_upc);
     }
 
     // Define a function 'buyItem' that allows the disributor to mark an item 'Sold'
@@ -205,53 +220,64 @@ contract SupplyChain is Ownable {
     function buyItem(uint256 _upc)
         public
         payable
-    // Call modifier to check if upc has passed previous supply chain stage
-
+        onlyDistributor
+        // Call modifier to check if upc has passed previous supply chain stage
+        forSale(_upc)
     // Call modifer to check if buyer has paid enough
 
     // Call modifer to send any excess ether back to buyer
 
     {
         // Update the appropriate fields - ownerID, distributorID, itemState
+
         // Transfer money to farmer
+
         // emit the appropriate event
+        emit Sold(_upc);
     }
 
     // Define a function 'shipItem' that allows the distributor to mark an item 'Shipped'
     // Use the above modifers to check if the item is sold
     function shipItem(uint256 _upc)
         public
-    // Call modifier to check if upc has passed previous supply chain stage
-
-    // Call modifier to verify caller of this function
-
+        // Call modifier to check if upc has passed previous supply chain stage
+        sold(_upc)
+        // Call modifier to verify caller of this function
+        onlyFarmer
     {
         // Update the appropriate fields
         // Emit the appropriate event
+        emit Shipped(_upc);
     }
 
     // Define a function 'receiveItem' that allows the retailer to mark an item 'Received'
     // Use the above modifiers to check if the item is shipped
     function receiveItem(uint256 _upc)
         public
-    // Call modifier to check if upc has passed previous supply chain stage
-
-    // Access Control List enforced by calling Smart Contract / DApp
+        // Call modifier to check if upc has passed previous supply chain stage
+        shipped(_upc)
+        // Access Control List enforced by calling Smart Contract / DApp
+        onlyRetailer
     {
         // Update the appropriate fields - ownerID, retailerID, itemState
+
         // Emit the appropriate event
+        emit Received(_upc);
     }
 
     // Define a function 'purchaseItem' that allows the consumer to mark an item 'Purchased'
     // Use the above modifiers to check if the item is received
     function purchaseItem(uint256 _upc)
         public
-    // Call modifier to check if upc has passed previous supply chain stage
-
-    // Access Control List enforced by calling Smart Contract / DApp
+        // Call modifier to check if upc has passed previous supply chain stage
+        received(_upc)
+        // Access Control List enforced by calling Smart Contract / DApp
+        onlyConsumer
     {
         // Update the appropriate fields - ownerID, consumerID, itemState
+
         // Emit the appropriate event
+        emit Purchased(_upc);
     }
 
     // Define a function 'fetchItemBufferOne' that fetches the data
