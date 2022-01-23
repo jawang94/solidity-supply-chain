@@ -155,6 +155,7 @@ contract SupplyChain is Ownable {
         Item memory item;
         item.upc = _upc;
         item.sku = sku;
+        // Origination Information
         item.ownerID = _originFarmerID;
         item.originFarmerID = _originFarmerID;
         item.originFarmName = _originFarmName;
@@ -164,6 +165,8 @@ contract SupplyChain is Ownable {
         item.productID = _upc + sku;
         item.productNotes = _productNotes;
         item.itemState = State.Harvested;
+        // Set item in mapping
+        items[_upc] = item;
 
         // Increment sku
         sku = sku + 1;
@@ -181,7 +184,7 @@ contract SupplyChain is Ownable {
         onlyFarmer
     {
         // Update the appropriate fields
-
+        items[upc].itemState = State.Processed;
         // Emit the appropriate event
         emit Processed(_upc);
     }
@@ -195,7 +198,7 @@ contract SupplyChain is Ownable {
         onlyFarmer
     {
         // Update the appropriate fields
-
+        items[upc].itemState = State.Packed;
         // Emit the appropriate event
         emit Packed(_upc);
     }
@@ -209,7 +212,8 @@ contract SupplyChain is Ownable {
         onlyFarmer
     {
         // Update the appropriate fields
-
+        items[upc].itemState = State.ForSale;
+        items[upc].productPrice = _price;
         // Emit the appropriate event
         emit ForSale(_upc);
     }
@@ -223,15 +227,17 @@ contract SupplyChain is Ownable {
         onlyDistributor
         // Call modifier to check if upc has passed previous supply chain stage
         forSale(_upc)
-    // Call modifer to check if buyer has paid enough
-
-    // Call modifer to send any excess ether back to buyer
-
+        // Call modifer to check if buyer has paid enough
+        paidEnough(items[_upc].productPrice)
+        // Call modifer to send any excess ether back to buyer
+        checkValue(_upc)
     {
         // Update the appropriate fields - ownerID, distributorID, itemState
-
+        items[_upc].ownerID = msg.sender;
+        items[_upc].distributorID = msg.sender;
+        items[_upc].itemState = State.Sold;
         // Transfer money to farmer
-
+        payable(items[_upc].originFarmerID).transfer(items[_upc].productPrice);
         // emit the appropriate event
         emit Sold(_upc);
     }
@@ -243,9 +249,10 @@ contract SupplyChain is Ownable {
         // Call modifier to check if upc has passed previous supply chain stage
         sold(_upc)
         // Call modifier to verify caller of this function
-        onlyFarmer
+        onlyDistributor
     {
         // Update the appropriate fields
+        items[_upc].itemState = State.Shipped;
         // Emit the appropriate event
         emit Shipped(_upc);
     }
@@ -260,7 +267,9 @@ contract SupplyChain is Ownable {
         onlyRetailer
     {
         // Update the appropriate fields - ownerID, retailerID, itemState
-
+        items[_upc].ownerID = msg.sender;
+        items[_upc].retailerID = msg.sender;
+        items[_upc].itemState = State.Received;
         // Emit the appropriate event
         emit Received(_upc);
     }
@@ -275,7 +284,9 @@ contract SupplyChain is Ownable {
         onlyConsumer
     {
         // Update the appropriate fields - ownerID, consumerID, itemState
-
+        items[_upc].ownerID = msg.sender;
+        items[_upc].retailerID = msg.sender;
+        items[_upc].itemState = State.Purchased;
         // Emit the appropriate event
         emit Purchased(_upc);
     }
@@ -296,6 +307,14 @@ contract SupplyChain is Ownable {
         )
     {
         // Assign values to the 8 parameters
+        itemSKU = items[_upc].sku;
+        itemUPC = items[_upc].upc;
+        ownerID = items[_upc].ownerID;
+        originFarmerID = items[_upc].originFarmerID;
+        originFarmName = items[_upc].originFarmName;
+        originFarmInformation = items[_upc].originFarmInformation;
+        originFarmLatitude = items[_upc].originFarmLatitude;
+        originFarmLongitude = items[_upc].originFarmLongitude;
 
         return (
             itemSKU,
@@ -326,6 +345,15 @@ contract SupplyChain is Ownable {
         )
     {
         // Assign values to the 9 parameters
+        itemSKU = items[_upc].sku;
+        itemUPC = items[_upc].upc;
+        productID = items[_upc].productID;
+        productNotes = items[_upc].productNotes;
+        productPrice = items[_upc].productPrice;
+        itemState = uint256(items[_upc].itemState);
+        distributorID = items[_upc].distributorID;
+        retailerID = items[_upc].retailerID;
+        consumerID = items[_upc].consumerID;
 
         return (
             itemSKU,
