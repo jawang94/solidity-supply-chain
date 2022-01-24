@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fair Trade Coffee</title>
+    <!--    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">-->
+    <!--    <link rel="stylesheet" type="text/css" href="style.css">-->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <style>
+      button {
+        margin: 0 5px;
+      }
+      .button-group {
+        padding: 5px;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.3.3/dist/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@truffle/contract@4.3.5/dist/truffle-contract.js"></script>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1 style="text-align: center">Fair Trade Coffee</h1>
+      <hr />
+      <p style="text-align: center">
+        Prove the authenticity of coffee using the Ethereum blockchain.
+      </p>
+      <div class="row button-group">
+        <div class="col-md-12">
+          <div class="text-center">
+            <button
+              class="btn btn-primary"
+              id="setup"
+              onclick="App.setupAccounts()"
+            >
+              <i class="fa fa-magic"></i> Setup Accounts
+            </button>
+            <button
+              class="btn btn-warning"
+              id="button-fetch-data-1"
+              onclick="App.fetchItemBufferOne()"
+            >
+              <i class="fa fa-bars"></i> Fetch Data 1
+            </button>
+            <button
+              class="btn btn-warning"
+              id="button-fetch-data-2"
+              onclick="App.fetchItemBufferTwo()"
+            >
+              <i class="fa fa-bars"></i> Fetch Data 2
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="row button-group">
+        <div class="col-md-6">
+          <div class="pull-right">
+            <button
+              class="btn btn-info"
+              id="button-harvest"
+              onclick="App.harvestItem()"
+            >
+              <i class="fa fa-snowflake-o"></i> Harvest
+            </button>
+            <button
+              class="btn btn-info"
+              id="button-process"
+              onclick="App.processItem()"
+            >
+              <i class="fa fa-spinner"></i> Process
+            </button>
+            <button
+              class="btn btn-info"
+              id="button-pack"
+              onclick="App.packItem()"
+            >
+              <i class="fa fa-archive"></i> Pack
+            </button>
+            <button
+              class="btn btn-info"
+              id="button-forsale"
+              onclick="App.sellItem()"
+            >
+              <i class="fa fa-star"></i> ForSale
+            </button>
+          </div>
+        </div>
+        <!--        </div>-->
+        <!--        <div class="row button-group">-->
+        <div class="col-md-6">
+          <div class="pull-left">
+            <button
+              class="btn btn-success"
+              id="button-buy"
+              onclick="App.buyItem()"
+            >
+              <i class="fa fa-shopping-cart"></i> Buy
+            </button>
+            <button
+              class="btn btn-success"
+              id="button-ship"
+              onclick="App.shipItem()"
+            >
+              <i class="fa fa-car"></i> Ship
+            </button>
+            <button
+              class="btn btn-success"
+              id="button-receive"
+              onclick="App.receiveItem()"
+            >
+              <i class="fa fa-handshake-o"></i> Receive
+            </button>
+            <button
+              class="btn btn-success"
+              id="button-purchase"
+              onclick="App.purchaseItem()"
+            >
+              <i class="fa fa-money"></i> Purchase
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div id="ftc-harvest" class="col-md-6">
+          <form>
+            <h2>Product Overview</h2>
+            <hr />
+            <div class="form-group">
+              <label for="sku">SKU</label>
+              <input
+                class="form-control"
+                type="number"
+                id="sku"
+                name="sku"
+                value="App.sku"
+                disabled
+              /><br />
+              <label for="upc">UPC</label>
+              <input
+                class="form-control"
+                type="number"
+                id="upc"
+                name="upc"
+                value="App.upc"
+              /><br />
+              <label for="ownerID">Current Owner ID</label>
+              <input
+                class="form-control"
+                type="text"
+                id="ownerID"
+                name="ownerID"
+                value="App.ownerId"
+              /><br />
+            </div>
+            <div class="form-break"></div>
+            <h2>Farm Details</h2>
+            <hr />
+            <div class="form-group">
+              <label for="originFarmerID">Farmer ID</label>
+              <input
+                class="form-control"
+                type="text"
+                id="originFarmerID"
+                name="originFarmerID"
+                value="App.originFarmerID"
+              /><br />
+              <label for="originFarmName">Farm Name</label>
+              <input
+                class="form-control"
+                type="text"
+                id="originFarmName"
+                name="originFarmName"
+                value="App.originFarmerID"
+              /><br />
+              <label for="originFarmInformation">Farm Information</label>
+              <input
+                class="form-control"
+                type="text"
+                id="originFarmInformation"
+                name="originFarmInformation"
+                value="App.originFarmInformation"
+              /><br />
+              <label for="originFarmLatitude">Farm Latitude</label>
+              <input
+                class="form-control"
+                type="text"
+                id="originFarmLatitude"
+                name="originFarmLatitude"
+                value="App.originFarmLatitude"
+              /><br />
+              <label for="originFarmLongitude">Farm Longitude</label>
+              <input
+                class="form-control"
+                type="text"
+                id="originFarmLongitude"
+                name="originFarmLongitude"
+                value="App.originFarmLongitude"
+              /><br />
+            </div>
+            <div class="form-break"></div>
+            <h2>Product Details</h2>
+            <hr />
+            <div class="form-group">
+              <label for="productNotes">Product Notes</label>
+              <input
+                class="form-control"
+                type="text"
+                id="productNotes"
+                name="productNotes"
+                value="App.productNotes"
+              />
+              <label for="productPrice">Product Price (ETH)</label>
+              <input
+                class="form-control"
+                type="number"
+                id="productPrice"
+                name="productPrice"
+                value="App.productPrice"
+              />
+              <label for="distributorID">Distributor ID</label>
+              <input
+                class="form-control"
+                type="text"
+                id="distributorID"
+                name="distributorID"
+                value="App.distributorID"
+              />
+              <label for="retailerID">Retailer ID</label>
+              <input
+                class="form-control"
+                type="text"
+                id="retailerID"
+                name="retailerID"
+                value="App.retailerID"
+              />
+              <label for="consumerID">Distributor ID</label>
+              <input
+                class="form-control"
+                type="text"
+                id="consumerID"
+                name="consumerID"
+                value="App.consumerID"
+              />
+            </div>
+            <div class="form-break"></div>
+          </form>
+        </div>
+
+        <div class="col-md-6">
+          <h2>Transaction History<span id="ftc-history"></span></h2>
+          <hr />
+          <ul id="ftc-events">
+            <!-- Events will appear here from app.js -->
+          </ul>
+          <br />
+        </div>
+      </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <!-- <script src="js/web3.min.js"></script> -->
+    <script src="js/truffle-contract.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
