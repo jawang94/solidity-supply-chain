@@ -1,4 +1,4 @@
-pragma solidity >=0.4.24;
+pragma solidity >=0.6.0;
 
 import "../coffeecore/Ownable.sol";
 
@@ -77,7 +77,7 @@ contract SupplyChain is Ownable {
         _;
         uint256 _price = items[_upc].productPrice;
         uint256 amountToReturn = msg.value - _price;
-        payable(items[_upc].consumerID).transfer(amountToReturn);
+        payable(msg.sender).transfer(amountToReturn);
     }
 
     // Define a modifier that checks if an item.state of a upc is Harvested
@@ -131,7 +131,7 @@ contract SupplyChain is Ownable {
     // In the constructor set 'owner' to the address that instantiated the contract
     // and set 'sku' to 1
     // and set 'upc' to 1
-    constructor() payable {
+    constructor() public payable {
         sku = 1;
         upc = 1;
     }
@@ -181,6 +181,7 @@ contract SupplyChain is Ownable {
         // Call modifier to check if upc has passed previous supply chain stage
         harvested(_upc)
         // Call modifier to verify caller of this function
+        verifyCaller(msg.sender)
         onlyFarmer
     {
         // Update the appropriate fields
@@ -285,7 +286,7 @@ contract SupplyChain is Ownable {
     {
         // Update the appropriate fields - ownerID, consumerID, itemState
         items[_upc].ownerID = msg.sender;
-        items[_upc].retailerID = msg.sender;
+        items[_upc].consumerID = msg.sender;
         items[_upc].itemState = State.Purchased;
         // Emit the appropriate event
         emit Purchased(_upc);

@@ -1,4 +1,4 @@
-pragma solidity >=0.4.24;
+pragma solidity >=0.6.0;
 
 import "../coffeeaccesscontrol/ConsumerRole.sol";
 import "../coffeeaccesscontrol/DistributorRole.sol";
@@ -13,7 +13,7 @@ contract Ownable is ConsumerRole, DistributorRole, FarmerRole, RetailerRole {
     event TransferOwnership(address indexed oldOwner, address indexed newOwner);
 
     /// Assign the contract to an owner
-    constructor() {
+    constructor() public {
         origOwner = msg.sender;
         emit TransferOwnership(address(0), origOwner);
     }
