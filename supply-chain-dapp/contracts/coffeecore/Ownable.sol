@@ -1,12 +1,7 @@
 pragma solidity >=0.6.0;
 
-import "../coffeeaccesscontrol/ConsumerRole.sol";
-import "../coffeeaccesscontrol/DistributorRole.sol";
-import "../coffeeaccesscontrol/FarmerRole.sol";
-import "../coffeeaccesscontrol/RetailerRole.sol";
-
 /// Provides basic authorization control
-contract Ownable is ConsumerRole, DistributorRole, FarmerRole, RetailerRole {
+contract Ownable {
     address private origOwner;
 
     // Define an Event

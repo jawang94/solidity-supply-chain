@@ -148,11 +148,10 @@ App = {
 
       App.getMetamaskAccountID();
 
-      let processId = parseInt($(event.target).data('id'));
-      console.log('processId',processId);
+      let processId = parseInt(event.target.id);
 
       switch(processId) {
-          case 1:
+          case 'button-harvest':
               return await App.harvestItem(event);
           case 2:
               return await App.processItem(event);
@@ -340,9 +339,9 @@ App = {
             );
           };
       }
-
       App.contracts.SupplyChain.deployed().then(function(instance) {
-      let events = instance.allEvents(function(err, log){
+        let events = instance.allEvents(function(err, log){
+        console.log('hello', log)
         if (!err)
           $("#ftc-events").append('<li>' + log.event + ' - ' + log.transactionHash + '</li>');
       });
