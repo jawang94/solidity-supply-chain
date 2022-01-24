@@ -175,9 +175,6 @@ App = {
   },
 
   harvestItem: function(event) {
-      // event.preventDefault();
-      // var processId = parseInt($(event.target).data('id'));
-
       App.contracts.SupplyChain.deployed().then(function(instance) {
           return instance.harvestItem(
               App.upc, 
@@ -200,9 +197,6 @@ App = {
   },
 
   processItem: function (event) {
-      // event.preventDefault();
-      // let processId = parseInt($(event.target).data('id'));
-
       App.contracts.SupplyChain.deployed().then(function(instance) {
           return instance.processItem(App.upc, {from: App.originFarmerID});
       }).then(function(result) {
@@ -214,9 +208,6 @@ App = {
   },
   
   packItem: function (event) {
-      // event.preventDefault();
-      // let processId = parseInt($(event.target).data('id'));
-
       App.contracts.SupplyChain.deployed().then(function(instance) {
           return instance.packItem(App.upc, {from: App.originFarmerID});
       }).then(function(result) {
@@ -228,9 +219,6 @@ App = {
   },
 
   sellItem: function (event) {
-      // event.preventDefault();
-      // let processId = parseInt($(event.target).data('id'));
-
       App.contracts.SupplyChain.deployed().then(function(instance) {
           const productPrice = web3.toWei(1, "ether");
           console.log('productPrice',productPrice);
@@ -244,9 +232,6 @@ App = {
   },
 
   buyItem: function (event) {
-      // event.preventDefault();
-      // let processId = parseInt($(event.target).data('id'));
-
       App.contracts.SupplyChain.deployed().then(function(instance) {
           const walletValue = web3.toWei(3, "ether");
           return instance.buyItem(App.upc, {from: App.distributorID, value: walletValue});
@@ -259,9 +244,6 @@ App = {
   },
 
   shipItem: function (event) {
-      // event.preventDefault();
-      // let processId = parseInt($(event.target).data('id'));
-
       App.contracts.SupplyChain.deployed().then(function(instance) {
           return instance.shipItem(App.upc, {from: App.distributorID});
       }).then(function(result) {
@@ -273,9 +255,6 @@ App = {
   },
 
   receiveItem: function (event) {
-      // event.preventDefault();
-      // let processId = parseInt($(event.target).data('id'));
-
       App.contracts.SupplyChain.deployed().then(function(instance) {
           return instance.receiveItem(App.upc, {from: App.retailerID});
       }).then(function(result) {
@@ -287,9 +266,6 @@ App = {
   },
 
   purchaseItem: function (event) {
-      // event.preventDefault();
-      // let processId = parseInt($(event.target).data('id'));
-
       App.contracts.SupplyChain.deployed().then(function(instance) {
           return instance.purchaseItem(App.upc, {from: App.consumerID});
       }).then(function(result) {
@@ -301,8 +277,6 @@ App = {
   },
 
   fetchItemBufferOne: function () {
-  ///   event.preventDefault();
-  ///    var processId = parseInt($(event.target).data('id'));
       App.upc = $('#upc').val();
       console.log('upc',App.upc);
 
@@ -317,9 +291,6 @@ App = {
   },
 
   fetchItemBufferTwo: function () {
-  ///    event.preventDefault();
-  ///    var processId = parseInt($(event.target).data('id'));
-                      
       App.contracts.SupplyChain.deployed().then(function(instance) {
         return instance.fetchItemBufferTwo.call(App.upc);
       }).then(function(result) {
